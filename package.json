@@ -1,0 +1,34 @@
+{
+  "name": "restify.js",
+  "version": "0.0.1",
+  "description": "Create rest api faster in nodejs",
+  "main": "app.js",
+  "scripts": {
+    "test": "nodemon test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georoot/restify.js.git"
+  },
+  "keywords": [
+    "rest",
+    "api",
+    "api",
+    "express"
+  ],
+  "author": "Rahul Bhola <me@rahulbhola.in>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/georoot/restify.js/issues"
+  },
+  "homepage": "https://github.com/georoot/restify.js#readme",
+  "devDependencies": {
+    "express": "^4.14.0",
+    "nodemon": "^1.11.0"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "jsonfile": "^2.4.0",
+    "mongoose": "^4.6.8"
+  }
+}

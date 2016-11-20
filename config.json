@@ -1,0 +1,17 @@
+{
+	"__meta__":{
+		"database": "restify",
+		"namespace": "v1",
+		"enableAuth": true
+	},
+	"models":{
+		"userDetails": "./models/user.js",
+		"emailDetails": "./models/email.js"
+	},
+	"views" :{
+		"/users": {
+			"model" : "userDetails",
+			"mixin" : ["./mixins/helloMixin.js"]
+		}
+	}
+}
