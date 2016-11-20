@@ -7,7 +7,9 @@ restify = require('./app.js');
 
 app = express();
 
-apiInstance = new restify('./config.json');
+apiInstance = new restify;
+
+apiInstance.loadJson('./config.json');
 
 apiInstance.onload(function(status, context) {
   return app.use('/', context.as_view());

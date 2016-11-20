@@ -21,18 +21,17 @@ context = (object)->
 	this.initRoutes = ()->
 		for k, v of this.object.views
 			for i in v.mixin
-				require(i)(k,this.models[v.model],this.router)
+				require(i)("/"+this.object.__meta__.namespace+k,this.models[v.model],this.router)
 			
 
 	this.as_view = ()->
 		this.router
-		# this.router.get '/',(req,res,next)->
-		# 	res.send "Testing context"
 
 	return
 
-restify = (file)->
-	this.file = file
+restify = ()->
+	this.loadJson = (file)->
+		this.file = file
 
 	this.onload = (clbFunction)->
 		jsonfile.readFile this.file,(err,obj)->

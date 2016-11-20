@@ -38,7 +38,7 @@ context = function(object) {
         results1 = [];
         for (j = 0, len = ref1.length; j < len; j++) {
           i = ref1[j];
-          results1.push(require(i)(k, this.models[v.model], this.router));
+          results1.push(require(i)("/" + this.object.__meta__.namespace + k, this.models[v.model], this.router));
         }
         return results1;
       }).call(this));
@@ -50,8 +50,10 @@ context = function(object) {
   };
 };
 
-restify = function(file) {
-  this.file = file;
+restify = function() {
+  this.loadJson = function(file) {
+    return this.file = file;
+  };
   this.onload = function(clbFunction) {
     return jsonfile.readFile(this.file, function(err, obj) {
       if (err) {
