@@ -22,22 +22,48 @@ routes = (route,model,router)->
 					return res.status 401
 						.end()
 				if (match)
-					# Generate some unique token over here
-					token = jwt.sign({ user: model,salt: Math.random() }, 'shhhhh');
+					# FIXME : take key from the private key file for better security
+					token = jwt.sign({ userName: model.username
+							,id:model._id
+							,admin:model.is_superuser
+							,salt: Math.random()
+						}, 'shhhhh');
+					existingTokens = JSON.parse model.token
+					existingTokens.token.push token
+					console.log existingTokens
+					model.token = JSON.stringify existingTokens
+					model.save()
 					return res.status 200
 						.json {key:token}
 				else
 					return res.status 401
 						.end()
 
-	# This is the logout route
-	router.delete router,(req,res,next)->
-		res.send "You successfully logged out of the application"
+	router.post route+"/logout",(req,res,next)->
+		token = req.body["token"]
+		jwt.verify token, 'shhhhh',(err,decoded)->
+			if(err)
+				return res
+					.status 401
+					.end()
+			userId = decoded.id
+			model.findOne {_id:userId},(err,object)->
+				if(err)
+					return res
+						.status 401
+						.end()
+				existingTokens = JSON.parse object.token
+				index = existingTokens.token.indexOf token
+				existingTokens.token.splice index,1
+				object.token = JSON.stringify existingTokens
+				object.save()
+				return res.status 200
+					.end()			
 
 	# This is the signup route
 	router.post route+"/signup",(req,res,next)->
 		req.body['is_superuser'] = false
-		req.body['token']        = ""
+		req.body['token']        = '{"token":[]}'
 		bcrypt.hash req.body['password'],5,(err,password)->
 			if (err)
 				return res.status 401
@@ -53,10 +79,10 @@ routes = (route,model,router)->
 
 utils = ()->
 
-	is_authenticated = ()->
+	is_authenticated = (token)->
 		console.log "Test if the user is authenticated"
 
-	is_superuser = ()->
+	is_superuser = (token)->
 		console.log "test if is_superuser"
 
 module.exports["utils"] = utils

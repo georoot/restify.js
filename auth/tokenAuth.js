@@ -22,15 +22,22 @@ routes = function(route, model, router) {
       }
       hash = model.password;
       return bcrypt.compare(req.body['password'], hash, function(err, match) {
-        var token;
+        var existingTokens, token;
         if (err) {
           return res.status(401).end();
         }
         if (match) {
           token = jwt.sign({
-            user: model,
+            userName: model.username,
+            id: model._id,
+            admin: model.is_superuser,
             salt: Math.random()
           }, 'shhhhh');
+          existingTokens = JSON.parse(model.token);
+          existingTokens.token.push(token);
+          console.log(existingTokens);
+          model.token = JSON.stringify(existingTokens);
+          model.save();
           return res.status(200).json({
             key: token
           });
@@ -40,12 +47,34 @@ routes = function(route, model, router) {
       });
     });
   });
-  router["delete"](router, function(req, res, next) {
-    return res.send("You successfully logged out of the application");
+  router.post(route + "/logout", function(req, res, next) {
+    var token;
+    token = req.body["token"];
+    return jwt.verify(token, 'shhhhh', function(err, decoded) {
+      var userId;
+      if (err) {
+        return res.status(401).end();
+      }
+      userId = decoded.id;
+      return model.findOne({
+        _id: userId
+      }, function(err, object) {
+        var existingTokens, index;
+        if (err) {
+          return res.status(401).end();
+        }
+        existingTokens = JSON.parse(object.token);
+        index = existingTokens.token.indexOf(token);
+        existingTokens.token.splice(index, 1);
+        object.token = JSON.stringify(existingTokens);
+        object.save();
+        return res.status(200).end();
+      });
+    });
   });
   return router.post(route + "/signup", function(req, res, next) {
     req.body['is_superuser'] = false;
-    req.body['token'] = "";
+    req.body['token'] = '{"token":[]}';
     return bcrypt.hash(req.body['password'], 5, function(err, password) {
       if (err) {
         return res.status(401).end();
@@ -63,10 +92,10 @@ routes = function(route, model, router) {
 
 utils = function() {
   var is_authenticated, is_superuser;
-  is_authenticated = function() {
+  is_authenticated = function(token) {
     return console.log("Test if the user is authenticated");
   };
-  return is_superuser = function() {
+  return is_superuser = function(token) {
     return console.log("test if is_superuser");
   };
 };
