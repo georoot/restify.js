@@ -4,8 +4,6 @@ jwt    = require 'jsonwebtoken'
 
 
 routes = (route,model,router,cert)->
-	router.get route,(req,res,next)->
-		res.send "this is the auth endpoint"
 
 	# this is the login route
 	router.post route,(req,res,next)->

@@ -6,9 +6,6 @@ bcrypt = require('bcrypt');
 jwt = require('jsonwebtoken');
 
 routes = function(route, model, router, cert) {
-  router.get(route, function(req, res, next) {
-    return res.send("this is the auth endpoint");
-  });
   router.post(route, function(req, res, next) {
     var password, username;
     username = req.body['username'];
