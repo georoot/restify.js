@@ -71,3 +71,4 @@ Here are the list of features implemented and in the process of being implemente
 - [ ] Implement authentication as a part of framework
 - [ ] Add default mixins inside the library
 - [ ] Add YAML support compatible with swagger.io
+- [ ] Request throttling
