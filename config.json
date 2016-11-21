@@ -2,15 +2,19 @@
 	"__meta__":{
 		"database": "restify",
 		"namespace": "v1",
-		"enableAuth": true
+		"auth" : {
+			"enableAuth": true,
+			"routeHandle" : "auth",
+			"userModel" : "./models/user.js",
+			"authStrategy" : "./auth/tokenAuth.js"
+		}
 	},
 	"models":{
-		"userDetails": "./models/user.js",
 		"emailDetails": "./models/email.js"
 	},
 	"views" :{
 		"/users": {
-			"model" : "userDetails",
+			"model" : "emailDetails",
 			"mixin" : ["./mixins/helloMixin.js"]
 		}
 	}

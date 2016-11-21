@@ -1,6 +1,7 @@
 express  = require 'express'
 mongoose = require 'mongoose'
 jsonfile = require 'jsonfile'
+chalk    = require 'chalk'
 
 
 context = (object)->
@@ -10,18 +11,24 @@ context = (object)->
 
 	this.initDb = ()->
 		mongoose.connect 'mongodb://localhost/'+this.object.__meta__.database
-		console.log "Initializing database connection to : "+this.object.__meta__.database
+		console.log "Initializing database connection to : "+ chalk.blue this.object.__meta__.database
 		db = mongoose.connection
 		db.on 'error', console.error.bind(console, 'connection error:')
 		# Import all user defined models here
 		for k, v of this.object.models
 			this.models[k] = require v
-			console.log "Importing model : "+k
+			console.log "Importing model : "+ chalk.blue k
 
 	this.initRoutes = ()->
 		for k, v of this.object.views
 			for i in v.mixin
 				require(i)("/"+this.object.__meta__.namespace+k,this.models[v.model],this.router)
+
+	this.initAuthRoutes = ()->
+		if this.object.__meta__.auth.enableAuth
+			console.log chalk.red "enable auth endpoints"
+			this.authModel = require this.object.__meta__.auth.userModel
+			require(this.object.__meta__.auth.authStrategy).routes("/"+this.object.__meta__.auth.routeHandle,this.authModel,this.router)
 			
 
 	this.as_view = ()->
@@ -40,11 +47,8 @@ restify = ()->
 			this.context = new context obj
 			this.context.initDb()
 			this.context.initRoutes()
+			this.context.initAuthRoutes()
 			clbFunction true,this.context
-
-	this.echo = ()->
-		console.log "Simple hello"
-		return
 
 	return
 
