@@ -6,7 +6,8 @@
 			"enableAuth": true,
 			"routeHandle" : "auth",
 			"userModel" : "./models/user.js",
-			"authStrategy" : "./auth/tokenAuth.js"
+			"authStrategy" : "./auth/tokenAuth.js",
+			"privateKey": "/home/georoot/.ssh/id_rsa"
 		}
 	},
 	"models":{

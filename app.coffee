@@ -2,6 +2,7 @@ express  = require 'express'
 mongoose = require 'mongoose'
 jsonfile = require 'jsonfile'
 chalk    = require 'chalk'
+fs       = require 'fs'
 
 
 context = (object)->
@@ -28,7 +29,8 @@ context = (object)->
 		if this.object.__meta__.auth.enableAuth
 			console.log chalk.red "enable auth endpoints"
 			this.authModel = require this.object.__meta__.auth.userModel
-			require(this.object.__meta__.auth.authStrategy).routes("/"+this.object.__meta__.auth.routeHandle,this.authModel,this.router)
+			cert = fs.readFileSync this.object.__meta__.auth.privateKey
+			require(this.object.__meta__.auth.authStrategy).routes("/"+this.object.__meta__.auth.routeHandle,this.authModel,this.router,cert)
 			
 
 	this.as_view = ()->

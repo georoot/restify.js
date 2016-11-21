@@ -3,7 +3,7 @@ bcrypt = require 'bcrypt'
 jwt    = require 'jsonwebtoken'
 
 
-routes = (route,model,router)->
+routes = (route,model,router,cert)->
 	router.get route,(req,res,next)->
 		res.send "this is the auth endpoint"
 
@@ -22,15 +22,13 @@ routes = (route,model,router)->
 					return res.status 401
 						.end()
 				if (match)
-					# FIXME : take key from the private key file for better security
 					token = jwt.sign({ userName: model.username
 							,id:model._id
 							,admin:model.is_superuser
 							,salt: Math.random()
-						}, 'shhhhh');
+						}, cert, { algorithm: 'RS256'});
 					existingTokens = JSON.parse model.token
 					existingTokens.token.push token
-					console.log existingTokens
 					model.token = JSON.stringify existingTokens
 					model.save()
 					return res.status 200
@@ -41,7 +39,7 @@ routes = (route,model,router)->
 
 	router.post route+"/logout",(req,res,next)->
 		token = req.body["token"]
-		jwt.verify token, 'shhhhh',(err,decoded)->
+		jwt.verify token, cert, { algorithm: 'RS256'},(err,decoded)->
 			if(err)
 				return res
 					.status 401
@@ -77,10 +75,10 @@ routes = (route,model,router)->
 							.json err
 					res.send "route to create new user"
 
-utils = ()->
+utils = (cert)->
 
 	is_authenticated = (token)->
-		jwt.verify token, 'shhhhh',(err,decoded)->
+		jwt.verify token, cert, { algorithm: 'RS256'},(err,decoded)->
 			if(err)
 				return false
 			userId = decoded.id
@@ -97,7 +95,7 @@ utils = ()->
 
 
 	is_superuser = (token)->
-		jwt.verify token, 'shhhhh',(err,decoded)->
+		jwt.verify token, cert, { algorithm: 'RS256'},(err,decoded)->
 			if(err)
 				return false
 			else

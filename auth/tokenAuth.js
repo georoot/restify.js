@@ -5,7 +5,7 @@ bcrypt = require('bcrypt');
 
 jwt = require('jsonwebtoken');
 
-routes = function(route, model, router) {
+routes = function(route, model, router, cert) {
   router.get(route, function(req, res, next) {
     return res.send("this is the auth endpoint");
   });
@@ -32,10 +32,11 @@ routes = function(route, model, router) {
             id: model._id,
             admin: model.is_superuser,
             salt: Math.random()
-          }, 'shhhhh');
+          }, cert, {
+            algorithm: 'RS256'
+          });
           existingTokens = JSON.parse(model.token);
           existingTokens.token.push(token);
-          console.log(existingTokens);
           model.token = JSON.stringify(existingTokens);
           model.save();
           return res.status(200).json({
@@ -50,7 +51,9 @@ routes = function(route, model, router) {
   router.post(route + "/logout", function(req, res, next) {
     var token;
     token = req.body["token"];
-    return jwt.verify(token, 'shhhhh', function(err, decoded) {
+    return jwt.verify(token, cert, {
+      algorithm: 'RS256'
+    }, function(err, decoded) {
       var userId;
       if (err) {
         return res.status(401).end();
@@ -90,10 +93,12 @@ routes = function(route, model, router) {
   });
 };
 
-utils = function() {
+utils = function(cert) {
   var is_authenticated, is_superuser;
   is_authenticated = function(token) {
-    return jwt.verify(token, 'shhhhh', function(err, decoded) {
+    return jwt.verify(token, cert, {
+      algorithm: 'RS256'
+    }, function(err, decoded) {
       var userId;
       if (err) {
         return false;
@@ -117,7 +122,9 @@ utils = function() {
     });
   };
   return is_superuser = function(token) {
-    return jwt.verify(token, 'shhhhh', function(err, decoded) {
+    return jwt.verify(token, cert, {
+      algorithm: 'RS256'
+    }, function(err, decoded) {
       if (err) {
         return false;
       } else {
