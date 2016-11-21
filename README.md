@@ -70,5 +70,6 @@ Here are the list of features implemented and in the process of being implemente
 - [x] Implement model framework
 - [ ] Implement authentication as a part of framework
 - [ ] Add default mixins inside the library
+- [ ] HTML based api browser like `postman`
 - [ ] Add YAML support compatible with swagger.io
 - [ ] Request throttling
