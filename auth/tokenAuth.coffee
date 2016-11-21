@@ -80,10 +80,29 @@ routes = (route,model,router)->
 utils = ()->
 
 	is_authenticated = (token)->
-		console.log "Test if the user is authenticated"
+		jwt.verify token, 'shhhhh',(err,decoded)->
+			if(err)
+				return false
+			userId = decoded.id
+			model.findOne {_id:userId},(err,object)->
+				if(err)
+					return false
+				existingTokens = JSON.parse object.token
+				index = existingTokens.token.indexOf token
+				if (index == -1)
+					return false
+				else
+					return true
+
+
 
 	is_superuser = (token)->
-		console.log "test if is_superuser"
+		jwt.verify token, 'shhhhh',(err,decoded)->
+			if(err)
+				return false
+			else
+				return decoded.admin
+
 
 module.exports["utils"] = utils
 module.exports["routes"] = routes

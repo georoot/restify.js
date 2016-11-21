@@ -93,10 +93,37 @@ routes = function(route, model, router) {
 utils = function() {
   var is_authenticated, is_superuser;
   is_authenticated = function(token) {
-    return console.log("Test if the user is authenticated");
+    return jwt.verify(token, 'shhhhh', function(err, decoded) {
+      var userId;
+      if (err) {
+        return false;
+      }
+      userId = decoded.id;
+      return model.findOne({
+        _id: userId
+      }, function(err, object) {
+        var existingTokens, index;
+        if (err) {
+          return false;
+        }
+        existingTokens = JSON.parse(object.token);
+        index = existingTokens.token.indexOf(token);
+        if (index === -1) {
+          return false;
+        } else {
+          return true;
+        }
+      });
+    });
   };
   return is_superuser = function(token) {
-    return console.log("test if is_superuser");
+    return jwt.verify(token, 'shhhhh', function(err, decoded) {
+      if (err) {
+        return false;
+      } else {
+        return decoded.admin;
+      }
+    });
   };
 };
 
